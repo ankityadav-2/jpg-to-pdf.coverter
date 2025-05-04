@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JPG to PDF Converter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <div class="min-h-screen flex flex-col items-center justify-start py-10">
+    <!-- Converter Card -->
+    <div class="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full space-y-6">
+      <h1 class="text-2xl font-bold text-center text-gray-800">📸 JPG to PDF Converter</h1>
+
+      <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-blue-400 rounded-xl cursor-pointer bg-blue-50 hover:bg-blue-100 transition">
+        <input type="file" id="upload" accept="image/jpeg" multiple class="hidden">
+        <span class="text-blue-600 text-sm font-medium">Click or Drag & Drop JPGs Here</span>
+        <span class="text-gray-500 text-xs mt-1">(Only .jpg images supported)</span>
+      </label>
+
+      <button onclick="convertToPDF()" class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition font-semibold">
+        Convert to PDF
+      </button>
+
+      <div id="status" class="text-center text-sm text-gray-500"></div>
+    </div>
+
+    <!-- About Section -->
+    <div class="max-w-3xl mt-10 bg-white shadow rounded-2xl p-6 text-gray-800">
+      <h2 class="text-xl font-semibold mb-4">📝 About This Project</h2>
+
+      <p class="mb-4">
+        This is a lightweight, client-side <strong>JPG to PDF converter</strong> built using HTML, JavaScript, and Tailwind CSS.
+        It allows users to upload multiple .jpg images and instantly convert them into a downloadable PDF—all without uploading anything to a server.
+      </p>
+
+      <h3 class="font-semibold mt-4 mb-2">🎯 Features</h3>
+      <ul class="list-disc pl-6 space-y-1">
+        <li>Drag-and-drop or file picker input</li>
+        <li>Support for multiple JPGs</li>
+        <li>PDF generated and downloaded in-browser</li>
+        <li>Clean, responsive design</li>
+      </ul>
+
+      <h3 class="font-semibold mt-6 mb-2">🎨 Design Approach</h3>
+      <p>
+        Built with <a href="https://tailwindcss.com" class="text-blue-600 underline" target="_blank">Tailwind CSS</a> for fast, responsive design.
+        The UI emphasizes simplicity and clarity, ensuring a smooth user experience on all devices.
+      </p>
+
+      <h3 class="font-semibold mt-6 mb-2">🚀 Technical Details</h3>
+      <p>
+        The converter uses the open-source <a href="https://github.com/parallax/jsPDF" class="text-blue-600 underline" target="_blank">jsPDF</a> library to assemble the PDF file.
+        It uses the FileReader API to load images and embeds them directly into the document.
+      </p>
+
+      <h3 class="font-semibold mt-6 mb-2">📌 Future Improvements</h3>
+      <ul class="list-disc pl-6 space-y-1">
+        <li>Image preview before converting</li>
+        <li>Allow reordering images</li>
+        <li>Support PNG or WebP</li>
+        <li>Adjustable PDF settings (size, orientation)</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    async function convertToPDF() {
+      const { jsPDF } = window.jspdf;
+      const input = document.getElementById('upload');
+      const files = Array.from(input.files);
+      const status = document.getElementById('status');
+
+      if (files.length === 0) {
+        alert("Please select at least one JPG image.");
+        return;
+      }
+
+      status.innerText = "Converting... Please wait.";
+      const pdf = new jsPDF();
+
+      for (let i = 0; i < files.length; i++) {
+        const imgData = await readAsDataURL(files[i]);
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 10, 10, 190, 270);
+      }
+
+      pdf.save("converted.pdf");
+      status.innerText = "✅ PDF downloaded successfully!";
+    }
+
+    function readAsDataURL(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+  </script>
+
+</body>
+</html>
